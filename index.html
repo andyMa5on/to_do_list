@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
 		<link rel="stylesheet" href="styles.css" />
-		<script src="shared.js"></script>
+		<script src="shared.js" defer></script>
 	</head>
 
 	<body>
@@ -16,19 +16,47 @@
 		<header>
 			<div id="header" class="header">
 				<h1>To Do List</h1>
-				<button>Add</button>
+				<button id="add_btn">Add</button>
 			</div>
 		</header>
 
+		<aside id="menu">
+			<div class="menuHeader">
+				<h2>Projects</h2>
+				<button>add</button>
+			</div>
+			<li>test</li>
+			<li>1</li>
+			<li>2</li>
+		</aside>
+
 		<section id="app">
-			<aside>
-				<div>
-					<h2>Projects</h2>
-				</div>
-			</aside>
-	
+			<div>
+				<button id="menu_btn">
+					<svg
+						width="25"
+						height="25"
+						viewBox="0 0 32 28"
+						fill="none"
+						stroke="#000000"
+						stroke-width="1.75"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<line x1="3" y1="12" x2="21" y2="12"></line>
+						<line x1="3" y1="6" x2="21" y2="6"></line>
+						<line x1="3" y1="18" x2="21" y2="18"></line>
+					</svg>
+					Projects
+				</button>
+			</div>
+
 			<section id="tasks" class="tasks">
-				<h2>Current Tasks</h2>
+				<h2>Project: <span id="projectTitle"></span></h2>
+				<li class="taskItem">
+					<input type="text" value="This is a test task" editable />
+					<button>Delete</button>
+				</li>
 			</section>
 		</section>
 	</body>
