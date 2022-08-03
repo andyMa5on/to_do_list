@@ -16,7 +16,7 @@
 		<header>
 			<div id="header" class="header">
 				<h1>To Do List</h1>
-				<button id="add_btn">Add</button>
+				<button id="add_btn" onclick="CreateTaskModal.render">Add</button>
 			</div>
 		</header>
 
@@ -53,10 +53,6 @@
 
 			<section id="tasks" class="tasks">
 				<h2>Project: <span id="projectTitle"></span></h2>
-				<li class="taskItem">
-					<input type="text" value="This is a test task" editable />
-					<button>Delete</button>
-				</li>
 			</section>
 		</section>
 	</body>

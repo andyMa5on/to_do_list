@@ -15,10 +15,32 @@ class CreateTaskModal {
 	constructor(){}
 
 	render(){
-		const modal = document.getElementById('modal')
+		const modal = document.getElementById('modal');
+		const backdrop = document.getElementById('backdrop');
+
 		modal. innerHTML =`
-			
+			<div id="modal_Inputs">
+				<input type="text" id="taskTitle" name="task">
+			</div>
+			<div id="modal_Btns">
+				<button class="cancel_btn">cancel</button>
+				<button class="add_btn">add</button>
+			</div>
 		`
+
+		const decon_Modal = new DeconstructModal
+		const cancelBtn = modal.querySelector('.cancel_btn')
+		cancelBtn.addEventListener('click', decon_Modal.remove)
+
+		const add_Task = new AddTask
+		const addBtn = modal.querySelector('.add_btn')
+		addBtn.addEventListener('click', () => {
+			add_Task.render()
+		})
+
+
+		backdrop.classList.toggle('hidden');
+		modal.classList.toggle('hidden');
 
 	}
 }
@@ -27,7 +49,11 @@ class DeconstructModal {
 	constructor(){}
 
 	remove(){
+		const modal = document.getElementById('modal');
+		const backdrop = document.getElementById('backdrop');
 
+		modal.classList.toggle('hidden');
+		backdrop.classList.toggle('hidden')
 	}
 }
 
@@ -64,16 +90,22 @@ class CreateTask_Element{
 class AddTask {
     constructor(){}
 
-	render(project, task) {
+	render(project) {
 		const taskList = document.getElementById('tasks');
-		const newtask = new CreateTask_Object(project, task)
-		const taskElm = new CreateTask_Element(newtask)
+		const taskTitle = document.getElementById('taskTitle');
+		const newtask = new CreateTask_Object(project, taskTitle.value);
+		const taskElm = new CreateTask_Element(newtask);
 		const liElm = taskElm.render();
-		taskList.append(liElm)
+		taskList.append(liElm);
+		const modal = document.getElementById('modal');
+		const backdrop = document.getElementById('backdrop');
+		taskTitle.value = '';
+		modal.classList.toggle('hidden');
+		backdrop.classList.toggle('hidden');
 	}
 }
 
-
+const createModal = new CreateTaskModal
 
 projectsMenu.addEventListener('click', openMenu);
-addTask_Btn.addEventListener('click', AddTask.render)
+addTask_Btn.addEventListener('click', createModal.render)
