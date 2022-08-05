@@ -51,16 +51,18 @@ class DeconstructModal {
 	remove(){
 		const modal = document.getElementById('modal');
 		const backdrop = document.getElementById('backdrop');
-
+		
 		modal.classList.toggle('hidden');
 		backdrop.classList.toggle('hidden')
 	}
 }
 
 class CreateTask_Object {
-	constructor(project, task) { 
+	constructor(project, task) {
+		this.id = Date.now();
 		this.project = project;
 		this.task = task;
+		allTasks.push(this);
 	}
 }
 
@@ -68,6 +70,7 @@ class CreateTask_Element{
 	constructor(taskObject){
 		this.taskItem = taskObject
 	}
+
 
 	render(){
 		const liElm = document.createElement('li');
@@ -77,13 +80,23 @@ class CreateTask_Element{
 			<button>Delete</button>
 		`
 		const deleteButton = liElm.querySelector('button')
-		deleteButton.addEventListener('click', this.remove.bind(this, parent))
+		deleteButton.addEventListener('click', this.remove.bind(this, liElm))
 		return liElm;
 	}
 
-	remove(taskObject, parent){
-		console.log(taskObject);
-		console.log(parent);
+	remove(element){
+		console.log(this.taskItem)
+		console.log(element)
+
+		const confirmDeletion = confirm('Are you sure you wish to delete this item?')
+
+		if(confirmDeletion == true){
+			const taskList = document.getElementById('tasks');
+			taskList.removeChild(element)
+		} else {
+			return
+		}
+		
 	}
 }
 
