@@ -12,40 +12,10 @@ function openMenu() {
 	app.classList.toggle('minimise');
 }
 
-class CreateProjectModal {
+class CreateModal {
 	constructor() {}
 
-	render() {
-		const modal = document.getElementById('modal');
-		const backdrop = document.getElementById('backdrop');
-
-		modal.innerHTML = `
-			<div id="modal_Inputs">
-				<input type="text" id="projectTitle">
-			</div>
-			<div id="modal_Btns">
-				<button class="cancel_btn">cancel</button>
-				<button class="add_btn">add</button>
-			</div>
-		`;
-
-		const decon_Modal = new DeconstructModal();
-		const cancelBtn = modal.querySelector('.cancel_btn');
-		cancelBtn.addEventListener('click', decon_Modal.remove);
-
-		const addProject = new AddProject();
-		const addBtn = modal.querySelector('.add_btn');
-		addBtn.addEventListener('click', addProject.render);
-
-		backdrop.classList.toggle('hidden');
-		modal.classList.toggle('hidden');
-	}
-}
-
-class CreateTaskModal {
-	constructor() {}
-
-	render() {
+	renderTask() {
 		const modal = document.getElementById('modal');
 		const backdrop = document.getElementById('backdrop');
 
@@ -66,6 +36,32 @@ class CreateTaskModal {
 		const add_Task = new AddTask();
 		const addBtn = modal.querySelector('.add_btn');
 		addBtn.addEventListener('click', add_Task.render);
+
+		backdrop.classList.toggle('hidden');
+		modal.classList.toggle('hidden');
+	}
+
+	renderProject() {
+		const modal = document.getElementById('modal');
+		const backdrop = document.getElementById('backdrop');
+
+		modal.innerHTML = `
+			<div id="modal_Inputs">
+				<input type="text" id="projectTitle">
+			</div>
+			<div id="modal_Btns">
+				<button class="cancel_btn">cancel</button>
+				<button class="add_btn">add</button>
+			</div>
+		`;
+
+		const decon_Modal = new DeconstructModal();
+		const cancelBtn = modal.querySelector('.cancel_btn');
+		cancelBtn.addEventListener('click', decon_Modal.remove);
+
+		const addProject = new AddProject();
+		const addBtn = modal.querySelector('.add_btn');
+		addBtn.addEventListener('click', addProject.render);
 
 		backdrop.classList.toggle('hidden');
 		modal.classList.toggle('hidden');
@@ -153,9 +149,38 @@ class CreateProject_Element {
 	render() {
 		const liElm = document.createElement('li');
 		liElm.innerHTML = `
-		<li>${this.projectItem}</li>
+		<div>${this.projectItem}</div>
+		<button>Delete</button>
 		`;
+
+		const divElm = liElm.querySelector('div')
+		divElm.addEventListener('click', this.uiUpdate.bind(this))
+
+		const removeBtn = liElm.querySelector('button')
+		removeBtn.addEventListener('click', this.remove.bind(this, liElm))
 		return liElm;
+	}
+
+	uiUpdate() {
+		const title = document.getElementById('project_Title');
+		title.innerText = this.projectItem;
+		
+
+	}
+
+	remove(element) {
+		console.log(element)
+
+		const confirmDeletion = confirm(
+			'Are you sure you wish to delete this project?'
+		);
+
+		if (confirmDeletion == true) {
+			const project = document.getElementById('menu');
+			project.removeChild(element);
+		} else {
+			return;
+		}
 	}
 }
 
@@ -174,9 +199,8 @@ class AddProject {
 	}
 }
 
-const createModal = new CreateTaskModal();
-const createProjectModal = new CreateProjectModal();
+const createModal = new CreateModal();
 
 projectsMenu.addEventListener('click', openMenu);
-addProject_Btn.addEventListener('click', createProjectModal.render);
-addTask_Btn.addEventListener('click', createModal.render);
+addProject_Btn.addEventListener('click', createModal.renderProject);
+addTask_Btn.addEventListener('click', createModal.renderTask);

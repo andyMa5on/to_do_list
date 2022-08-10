@@ -5,6 +5,7 @@
 body {
 	margin: 0;
 	background-color: rgba(0, 0, 0, 0.042);
+	overflow-x: hidden;
 }
 
 .backdrop {
@@ -103,6 +104,7 @@ aside {
 	top: 79.875px; /* height of header */
 	background-color: white;
 	min-width: 30%;
+	max-width: 30%;
 	height: 89vh;
 	padding: 0.5rem;
 	box-shadow: 1px 1px 4px 4px rgba(0, 0, 0, 0.03);
@@ -110,6 +112,18 @@ aside {
 	overflow-y: auto;
 	transform: translateX(-100%);
 	transition: all ease-in-out 0.5s;
+}
+
+#menu > li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#menu > li > div {
+	font-size: 1rem;
+	margin-right: 0.5rem;
+	overflow-wrap: normal;
 }
 
 .appear {
