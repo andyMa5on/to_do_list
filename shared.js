@@ -1,12 +1,12 @@
 const projectsMenu = document.getElementById('menu_btn');
 const addTask_Btn = document.getElementById('add_btn');
 const addProject_Btn = document.getElementById('add_Project');
+const menuClose_Btn = document.getElementById('menuClose_Btn');
 const allTasks = [];
 
 function openMenu() {
 	const app = document.getElementById('app');
 	const menu = document.getElementById('menu');
-	const header = document.getElementById('header');
 
 	menu.classList.toggle('appear');
 	app.classList.toggle('minimise');
@@ -37,8 +37,11 @@ class CreateModal {
 		const addBtn = modal.querySelector('.add_btn');
 		addBtn.addEventListener('click', add_Task.render);
 
+		backdrop.addEventListener('click', decon_Modal.remove);
 		backdrop.classList.toggle('hidden');
 		modal.classList.toggle('hidden');
+
+		modal.querySelector('input').focus();
 	}
 
 	renderProject() {
@@ -63,8 +66,11 @@ class CreateModal {
 		const addBtn = modal.querySelector('.add_btn');
 		addBtn.addEventListener('click', addProject.render);
 
+		backdrop.addEventListener('click', decon_Modal.remove);
 		backdrop.classList.toggle('hidden');
 		modal.classList.toggle('hidden');
+
+		modal.querySelector('input').focus();
 	}
 }
 
@@ -83,9 +89,12 @@ class DeconstructModal {
 class CreateTask_Object {
 	constructor(project, task) {
 		this.id = Date.now();
-		this.project = project;
 		this.task = task;
-		allTasks.push(this);
+		allTasks.forEach((item, idx, allTasks) => {
+			if (item.project === project) {
+				item.tasks.push(this);
+			}
+		});
 	}
 }
 
@@ -117,6 +126,14 @@ class CreateTask_Element {
 		if (confirmDeletion == true) {
 			const taskList = document.getElementById('tasks');
 			taskList.removeChild(element);
+
+			allTasks.forEach((item, idx, allTasks) => {
+				item.tasks.forEach((task, position, tasks) => {
+					if (task.id == this.taskItem.id) {
+						allTasks[idx].tasks.splice(position, 1);
+					}
+				});
+			});
 		} else {
 			return;
 		}
@@ -126,10 +143,14 @@ class CreateTask_Element {
 class AddTask {
 	constructor() {}
 
-	render(project) {
+	render() {
 		const taskList = document.getElementById('tasks');
 		const taskTitle = document.getElementById('taskTitle');
-		const newtask = new CreateTask_Object(project, taskTitle.value);
+		const projectTitle = document.getElementById('project_Title');
+		const newtask = new CreateTask_Object(
+			projectTitle.innerText,
+			taskTitle.value
+		);
 		const taskElm = new CreateTask_Element(newtask);
 		const liElm = taskElm.render();
 		taskList.append(liElm);
@@ -141,36 +162,72 @@ class AddTask {
 	}
 }
 
+class CreateProject_Object {
+	constructor(title) {
+		this.project = title;
+		this.tasks = [];
+		allTasks.push(this);
+	}
+}
+
 class CreateProject_Element {
 	constructor(projectTitle) {
 		this.projectItem = projectTitle;
+		console.log(this.projectItem);
 	}
 
 	render() {
 		const liElm = document.createElement('li');
 		liElm.innerHTML = `
-		<div>${this.projectItem}</div>
+		<div>${this.projectItem.project}</div>
 		<button>Delete</button>
 		`;
 
-		const divElm = liElm.querySelector('div')
-		divElm.addEventListener('click', this.uiUpdate.bind(this))
+		const divElm = liElm.querySelector('div');
+		divElm.addEventListener('click', this.uiUpdate.bind(this));
 
-		const removeBtn = liElm.querySelector('button')
-		removeBtn.addEventListener('click', this.remove.bind(this, liElm))
+		const removeBtn = liElm.querySelector('button');
+		removeBtn.addEventListener('click', this.remove.bind(this, liElm));
 		return liElm;
 	}
 
 	uiUpdate() {
-		const title = document.getElementById('project_Title');
-		title.innerText = this.projectItem;
-		
+		if (allTasks.length > 0) {
+			const taskArea = document.getElementById('tasks');
+			taskArea.innerHTML = `
+				<h2>Project: <span id="project_Title"></span></h2>
+			`;
+			const title = document.getElementById('project_Title');
+			title.innerText = this.projectItem.project;
 
+			allTasks.forEach((item, idx, allTasks) => {
+				if (item.project === this.projectItem.project) {
+					item.tasks.forEach((task, idx, tasks) => {
+						const taskList = document.getElementById('tasks');
+						const taskElm = new CreateTask_Element(task);
+						const liElm = taskElm.render();
+						taskList.append(liElm);
+					});
+				}
+			});
+			const projectList = document.getElementById('menu');
+			if (projectList.classList.contains('appear')) {
+				openMenu();
+			}
+		} else {
+			const taskArea = document.getElementById('tasks');
+			taskArea.innerHTML = `
+				<p class="noProjects">You currently have no Projects</p>
+				<p class="noProjects">Lets get started by creating your first one now</P>
+				<button>Create Now</button>
+			`;
+
+			const button = taskArea.querySelector('button');
+			button.addEventListener('click', createModal.renderProject);
+		}
 	}
 
 	remove(element) {
-		console.log(element)
-
 		const confirmDeletion = confirm(
 			'Are you sure you wish to delete this project?'
 		);
@@ -178,6 +235,27 @@ class CreateProject_Element {
 		if (confirmDeletion == true) {
 			const project = document.getElementById('menu');
 			project.removeChild(element);
+			allTasks.forEach((item, idx, alltasks) => {
+				if (item.project === this.projectItem.project) {
+					allTasks.splice(idx, 1);
+					const currentProject_title =
+						document.getElementById('project_Title');
+					if (
+						currentProject_title.innerText ===
+						this.projectItem.project
+					) {
+						if (allTasks.length >= 1) {
+							const newUI = new CreateProject_Element(
+								allTasks[0]
+							);
+							newUI.uiUpdate();
+						} else {
+							const newUI = new CreateProject_Element();
+							newUI.uiUpdate();
+						}
+					}
+				}
+			});
 		} else {
 			return;
 		}
@@ -186,21 +264,90 @@ class CreateProject_Element {
 
 class AddProject {
 	render() {
+		let uniqueProject = true;
 		const projectList = document.getElementById('menu');
 		const projectTitle = document.getElementById('projectTitle');
-		const projectElm = new CreateProject_Element(projectTitle.value);
-		const liElm = projectElm.render();
-		projectList.append(liElm)
-		const modal = document.getElementById('modal');
-		const backdrop = document.getElementById('backdrop');
-		projectTitle.value = '';
-		modal.classList.toggle('hidden');
-		backdrop.classList.toggle('hidden');
+		allTasks.forEach((item, idx, allTasks) => {
+			if (item.project.includes(projectTitle.value)) {
+				uniqueProject = false;
+			}
+		});
+		if (uniqueProject === true) {
+			const project_Object = new CreateProject_Object(projectTitle.value);
+			const projectElm = new CreateProject_Element(project_Object);
+			const liElm = projectElm.render();
+			projectList.append(liElm);
+			projectElm.uiUpdate();
+			const modal = document.getElementById('modal');
+			const backdrop = document.getElementById('backdrop');
+			modal.classList.toggle('hidden');
+			backdrop.classList.toggle('hidden');
+
+			if (projectList.classList.contains('appear')) {
+				openMenu();
+			}
+		} else {
+			const warning = alert(
+				'A project of this name already exsists \n'+
+				'Please create a unique name'
+			);
+			projectTitle.focus()
+		}
+	}
+}
+
+class Page {
+	renderPage() {
+		const taskArea = document.getElementById('tasks');
+
+		if (allTasks.length >= 1) {
+			let projects = [];
+
+			allTasks.forEach((item, idx, alltasks) => {
+				if (!projects.includes(item.project)) {
+					projects.push(item.project);
+					const projectList = document.getElementById('menu');
+					const add_Project = new CreateProject_Element(item.project);
+					const liElm = add_Project.render();
+					projectList.append(liElm);
+				}
+			});
+			const newUI = new CreateProject_Element(allTasks[0].project);
+			newUI.uiUpdate();
+		} else {
+			taskArea.innerHTML = `
+				<p class="noProjects">You currently have no Projects</p>
+				<p class="noProjects">Lets get started by creating your first one now</P>
+				<button>Create Now</button>
+			`;
+
+			const button = taskArea.querySelector('button');
+			button.addEventListener('click', createModal.renderProject);
+		}
+	}
+
+	render_Projects(object) {
+		const liElm = document.createElement('li');
+		liElm.innerHTML = `
+		<div>${object.project}</div>
+		<button>Delete</button>
+		`;
+
+		const divElm = liElm.querySelector('li');
+		liElm.addEventListener('click', this.uiUpdate.bind(this));
+
+		const removeBtn = liElm.querySelector('button');
+		removeBtn.addEventListener('click', this.remove.bind(this, liElm));
+		return liElm;
 	}
 }
 
 const createModal = new CreateModal();
 
 projectsMenu.addEventListener('click', openMenu);
+menuClose_Btn.addEventListener('click', openMenu);
 addProject_Btn.addEventListener('click', createModal.renderProject);
 addTask_Btn.addEventListener('click', createModal.renderTask);
+
+const renderPage = new Page();
+renderPage.renderPage();
