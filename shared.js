@@ -2,7 +2,12 @@ const projectsMenu = document.getElementById('menu_btn');
 const addTask_Btn = document.getElementById('add_btn');
 const addProject_Btn = document.getElementById('add_Project');
 const menuClose_Btn = document.getElementById('menuClose_Btn');
-const allTasks = [];
+
+let allTasks =[];
+
+if(localStorage.key('allTasks') !== null) {
+	allTasks = JSON.parse(localStorage.getItem('allTasks'));
+};
 
 function openMenu() {
 	const app = document.getElementById('app');
@@ -95,6 +100,7 @@ class CreateTask_Object {
 				item.tasks.push(this);
 			}
 		});
+		Page.localStorage()
 	}
 }
 
@@ -116,9 +122,6 @@ class CreateTask_Element {
 	}
 
 	remove(element) {
-		console.log(this.taskItem);
-		console.log(element);
-
 		const confirmDeletion = confirm(
 			'Are you sure you wish to delete this item?'
 		);
@@ -134,6 +137,7 @@ class CreateTask_Element {
 					}
 				});
 			});
+			Page.localStorage()
 		} else {
 			return;
 		}
@@ -167,13 +171,13 @@ class CreateProject_Object {
 		this.project = title;
 		this.tasks = [];
 		allTasks.push(this);
+		Page.localStorage()
 	}
 }
 
 class CreateProject_Element {
 	constructor(projectTitle) {
 		this.projectItem = projectTitle;
-		console.log(this.projectItem);
 	}
 
 	render() {
@@ -256,6 +260,7 @@ class CreateProject_Element {
 					}
 				}
 			});
+			Page.localStorage()
 		} else {
 			return;
 		}
@@ -301,18 +306,14 @@ class Page {
 		const taskArea = document.getElementById('tasks');
 
 		if (allTasks.length >= 1) {
-			let projects = [];
-
 			allTasks.forEach((item, idx, alltasks) => {
-				if (!projects.includes(item.project)) {
-					projects.push(item.project);
 					const projectList = document.getElementById('menu');
-					const add_Project = new CreateProject_Element(item.project);
+					console.log(allTasks)
+					const add_Project = new CreateProject_Element(item);
 					const liElm = add_Project.render();
 					projectList.append(liElm);
-				}
 			});
-			const newUI = new CreateProject_Element(allTasks[0].project);
+			const newUI = new CreateProject_Element(allTasks[0]);
 			newUI.uiUpdate();
 		} else {
 			taskArea.innerHTML = `
@@ -326,7 +327,11 @@ class Page {
 		}
 	}
 
-	render_Projects(object) {
+	static localStorage() {
+		localStorage.setItem('allTasks', JSON.stringify(allTasks))
+	}
+
+	/* render_Projects(object) {
 		const liElm = document.createElement('li');
 		liElm.innerHTML = `
 		<div>${object.project}</div>
@@ -339,7 +344,7 @@ class Page {
 		const removeBtn = liElm.querySelector('button');
 		removeBtn.addEventListener('click', this.remove.bind(this, liElm));
 		return liElm;
-	}
+	} */
 }
 
 const createModal = new CreateModal();
