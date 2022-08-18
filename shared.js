@@ -3,11 +3,11 @@ const addTask_Btn = document.getElementById('add_btn');
 const addProject_Btn = document.getElementById('add_Project');
 const menuClose_Btn = document.getElementById('menuClose_Btn');
 
-let allTasks =[];
+let allTasks = [];
 
-if(localStorage.key('allTasks') !== null) {
+if (localStorage.key('allTasks') !== null) {
 	allTasks = JSON.parse(localStorage.getItem('allTasks'));
-};
+}
 
 function openMenu() {
 	const app = document.getElementById('app');
@@ -100,7 +100,7 @@ class CreateTask_Object {
 				item.tasks.push(this);
 			}
 		});
-		Page.localStorage()
+		Page.localStorage();
 	}
 }
 
@@ -118,7 +118,22 @@ class CreateTask_Element {
 		`;
 		const deleteButton = liElm.querySelector('button');
 		deleteButton.addEventListener('click', this.remove.bind(this, liElm));
+
+		const input = liElm.querySelector('input');
+		input.addEventListener('change', this.update.bind(this, liElm));
 		return liElm;
+	}
+
+	update(element) {
+		allTasks.forEach((item, idx, alltasks) => {
+			item.tasks.forEach((taskItem, index, tasks) => {
+				if (taskItem.id == this.taskItem.id) {
+					const input = element.querySelector('input');
+					taskItem.task = input.value;
+				}
+			});
+		});
+		Page.localStorage();
 	}
 
 	remove(element) {
@@ -137,7 +152,7 @@ class CreateTask_Element {
 					}
 				});
 			});
-			Page.localStorage()
+			Page.localStorage();
 		} else {
 			return;
 		}
@@ -171,7 +186,7 @@ class CreateProject_Object {
 		this.project = title;
 		this.tasks = [];
 		allTasks.push(this);
-		Page.localStorage()
+		Page.localStorage();
 	}
 }
 
@@ -260,7 +275,7 @@ class CreateProject_Element {
 					}
 				}
 			});
-			Page.localStorage()
+			Page.localStorage();
 		} else {
 			return;
 		}
@@ -273,7 +288,7 @@ class AddProject {
 		const projectList = document.getElementById('menu');
 		const projectTitle = document.getElementById('projectTitle');
 		allTasks.forEach((item, idx, allTasks) => {
-			if (item.project.includes(projectTitle.value)) {
+			if (item.project === projectTitle.value) {
 				uniqueProject = false;
 			}
 		});
@@ -293,10 +308,10 @@ class AddProject {
 			}
 		} else {
 			const warning = alert(
-				'A project of this name already exsists \n'+
-				'Please create a unique name'
+				'A project of this name already exsists \n' +
+					'Please create a unique name'
 			);
-			projectTitle.focus()
+			projectTitle.focus();
 		}
 	}
 }
@@ -305,13 +320,12 @@ class Page {
 	renderPage() {
 		const taskArea = document.getElementById('tasks');
 
-		if (allTasks.length >= 1) {
+		if (allTasks.length > 0) {
 			allTasks.forEach((item, idx, alltasks) => {
-					const projectList = document.getElementById('menu');
-					console.log(allTasks)
-					const add_Project = new CreateProject_Element(item);
-					const liElm = add_Project.render();
-					projectList.append(liElm);
+				const projectList = document.getElementById('menu');
+				const add_Project = new CreateProject_Element(item);
+				const liElm = add_Project.render();
+				projectList.append(liElm);
 			});
 			const newUI = new CreateProject_Element(allTasks[0]);
 			newUI.uiUpdate();
@@ -328,23 +342,8 @@ class Page {
 	}
 
 	static localStorage() {
-		localStorage.setItem('allTasks', JSON.stringify(allTasks))
+		localStorage.setItem('allTasks', JSON.stringify(allTasks));
 	}
-
-	/* render_Projects(object) {
-		const liElm = document.createElement('li');
-		liElm.innerHTML = `
-		<div>${object.project}</div>
-		<button>Delete</button>
-		`;
-
-		const divElm = liElm.querySelector('li');
-		liElm.addEventListener('click', this.uiUpdate.bind(this));
-
-		const removeBtn = liElm.querySelector('button');
-		removeBtn.addEventListener('click', this.remove.bind(this, liElm));
-		return liElm;
-	} */
 }
 
 const createModal = new CreateModal();

@@ -205,6 +205,7 @@ aside {
 	padding: 0.4rem;
 	width: 90%;
 	margin-right: 0.5rem;
+	text-overflow: ellipsis;
 }
 
 .taskItem > input:focus-visible {
