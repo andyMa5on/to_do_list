@@ -75,7 +75,7 @@ button {
 	font-size: 0.8rem;
 	font-weight: bold;
 	letter-spacing: 1px;
-	padding: 0.5rem 1rem;
+	padding: 0.3rem 0.5rem;
 	margin-right: 1rem;
 	border-radius: 8px;
 	border-color: rgb(255, 191, 0);
@@ -189,7 +189,6 @@ aside {
 
 #tasks > li {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 	list-style: none;
 	padding: 0.5rem;
@@ -200,7 +199,7 @@ aside {
 	border-radius: 8px;
 	text-align: center;
 }
-.taskItem > input {
+.taskItem > input[type="text"] {
 	border: none;
 	padding: 0.4rem;
 	width: 90%;
@@ -212,7 +211,8 @@ aside {
 	outline: none;
 }
 
-.taskItem > button {
+.bin {
+	margin-left: auto;
 	padding: 0.3rem 0.3rem;
 }
 

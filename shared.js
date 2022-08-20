@@ -113,13 +113,33 @@ class CreateTask_Element {
 		const liElm = document.createElement('li');
 		liElm.className = 'taskItem';
 		liElm.innerHTML = `
+			<input type="checkbox" name="complete" id="complete">
 			<input type="text" value="${this.taskItem.task}" editable />
-			<button>Delete</button>
+			<div class="bin">
+				<svg 
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="trashIcon"
+					>
+					<polyline points="3 6 5 6 21 6"></polyline>
+					<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+					</path>
+					<line x1="10" y1="11" x2="10" y2="17"></line>
+					<line x1="14" y1="11" x2="14" y2="17"></line>
+				</svg>
+			</div>
 		`;
-		const deleteButton = liElm.querySelector('button');
+		const deleteButton = liElm.querySelector('.bin');
 		deleteButton.addEventListener('click', this.remove.bind(this, liElm));
 
-		const input = liElm.querySelector('input');
+		const input = liElm.querySelector('input[type=text]');
+		console.log(input);
 		input.addEventListener('change', this.update.bind(this, liElm));
 		return liElm;
 	}
@@ -128,8 +148,9 @@ class CreateTask_Element {
 		allTasks.forEach((item, idx, alltasks) => {
 			item.tasks.forEach((taskItem, index, tasks) => {
 				if (taskItem.id == this.taskItem.id) {
-					const input = element.querySelector('input');
+					const input = element.querySelector('input[type=text]');
 					taskItem.task = input.value;
+					console.log(taskItem);
 				}
 			});
 		});
@@ -199,13 +220,31 @@ class CreateProject_Element {
 		const liElm = document.createElement('li');
 		liElm.innerHTML = `
 		<div>${this.projectItem.project}</div>
-		<button>Delete</button>
+		<div class="bin">
+				<svg 
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="trashIcon"
+					>
+					<polyline points="3 6 5 6 21 6"></polyline>
+					<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+					</path>
+					<line x1="10" y1="11" x2="10" y2="17"></line>
+					<line x1="14" y1="11" x2="14" y2="17"></line>
+				</svg>
+			</div>
 		`;
 
 		const divElm = liElm.querySelector('div');
 		divElm.addEventListener('click', this.uiUpdate.bind(this));
 
-		const removeBtn = liElm.querySelector('button');
+		const removeBtn = liElm.querySelector('.bin');
 		removeBtn.addEventListener('click', this.remove.bind(this, liElm));
 		return liElm;
 	}
