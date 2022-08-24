@@ -42,7 +42,7 @@ body {
 }
 
 #modal_Btns {
-	margin: 1rem;
+	margin: 1rem 1rem 0 1rem;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -205,6 +205,11 @@ aside {
 	width: 90%;
 	margin-right: 0.5rem;
 	text-overflow: ellipsis;
+	background-color: #ffffff00;
+}
+
+.taskCompleted {
+	background-color: rgba(0, 171, 0, 0.15);
 }
 
 .taskItem > input:focus-visible {
@@ -232,4 +237,12 @@ aside {
 		max-width: 100vw;
 		min-width: 100vw;
 	}
+
+	#modal {
+		left: 10%;
+		width: 80%;
+	}
+
+
+
 }

@@ -29,8 +29,8 @@ class CreateModal {
 				<input type="text" id="taskTitle">
 			</div>
 			<div id="modal_Btns">
-				<button class="cancel_btn">cancel</button>
-				<button class="add_btn">add</button>
+				<button class="cancel_btn">Cancel</button>
+				<button class="add_btn">Add Task</button>
 			</div>
 		`;
 
@@ -95,6 +95,7 @@ class CreateTask_Object {
 	constructor(project, task) {
 		this.id = Date.now();
 		this.task = task;
+		this.completed = 'no';
 		allTasks.forEach((item, idx, allTasks) => {
 			if (item.project === project) {
 				item.tasks.push(this);
@@ -135,13 +136,55 @@ class CreateTask_Element {
 				</svg>
 			</div>
 		`;
+
+		const checkbox = liElm.querySelector('input[type=checkbox]');
+		checkbox.addEventListener('change', this.complete.bind(this, liElm));
+
 		const deleteButton = liElm.querySelector('.bin');
 		deleteButton.addEventListener('click', this.remove.bind(this, liElm));
 
 		const input = liElm.querySelector('input[type=text]');
-		console.log(input);
 		input.addEventListener('change', this.update.bind(this, liElm));
+
+		if (this.taskItem.complete == 'yes') {
+			checkbox.checked = true;
+			liElm.classList.toggle('taskCompleted');
+			input.style.textDecoration = 'line-through';
+		}
 		return liElm;
+	}
+
+	complete(element) {
+		console.log(this);
+		const checkbox = element.querySelector('input[type=checkbox]');
+		const input = element.querySelector('input[type=text]');
+		if (checkbox.checked == true) {
+			element.classList.toggle('taskCompleted'),
+				(input.style.textDecoration = 'line-through');
+
+			allTasks.forEach((item, idx, allTasks) => {
+				item.tasks.forEach((task, index, tasks) => {
+					if (task.id == this.taskItem.id) {
+						task.complete = 'yes';
+						console.log(task);
+					}
+				});
+			});
+			Page.localStorage();
+		} else if (element.classList.contains('taskCompleted')) {
+			element.classList.toggle('taskCompleted');
+			input.style.textDecoration = 'none';
+
+			allTasks.forEach((item, idx, allTasks) => {
+				item.tasks.forEach((task, index, tasks) => {
+					if (task.id == this.taskItem.id) {
+						task.complete = 'no';
+						console.log(task);
+					}
+				});
+			});
+			Page.localStorage();
+		}
 	}
 
 	update(element) {
@@ -159,7 +202,7 @@ class CreateTask_Element {
 
 	remove(element) {
 		const confirmDeletion = confirm(
-			'Are you sure you wish to delete this item?'
+			'Are you sure you wish to permanently delete this task?'
 		);
 
 		if (confirmDeletion == true) {
@@ -287,7 +330,7 @@ class CreateProject_Element {
 
 	remove(element) {
 		const confirmDeletion = confirm(
-			'Are you sure you wish to delete this project?'
+			'Are you sure you wish to permanently delete this project?'
 		);
 
 		if (confirmDeletion == true) {
