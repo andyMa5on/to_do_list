@@ -2,7 +2,6 @@ const projectsMenu = document.getElementById('menu_btn');
 const addTask_Btn = document.getElementById('add_btn');
 const addProject_Btn = document.getElementById('add_Project');
 const menuClose_Btn = document.getElementById('menuClose_Btn');
-
 let allTasks = [];
 
 if (localStorage.key('allTasks') !== null) {
@@ -42,6 +41,13 @@ class CreateModal {
 		const addBtn = modal.querySelector('.add_btn');
 		addBtn.addEventListener('click', add_Task.render);
 
+		const input = modal.querySelector('#taskTitle');
+		input.addEventListener('keypress', (e) => {
+			if (e.key === "Enter"){
+				add_Task.render()
+			}
+		})
+
 		backdrop.addEventListener('click', decon_Modal.remove);
 		backdrop.classList.toggle('hidden');
 		modal.classList.toggle('hidden');
@@ -70,6 +76,13 @@ class CreateModal {
 		const addProject = new AddProject();
 		const addBtn = modal.querySelector('.add_btn');
 		addBtn.addEventListener('click', addProject.render);
+
+		const input = modal.querySelector('#projectTitle');
+		input.addEventListener('keypress', (e) => {
+			if (e.key === "Enter"){
+				addProject.render()
+			}
+		})
 
 		backdrop.addEventListener('click', decon_Modal.remove);
 		backdrop.classList.toggle('hidden');
@@ -113,6 +126,7 @@ class CreateTask_Element {
 	render() {
 		const liElm = document.createElement('li');
 		liElm.className = 'taskItem';
+		liElm.draggable = 'true';
 		liElm.innerHTML = `
 			<input type="checkbox" name="complete" id="complete">
 			<input type="text" value="${this.taskItem.task}" editable />
@@ -136,6 +150,11 @@ class CreateTask_Element {
 				</svg>
 			</div>
 		`;
+
+		liElm.addEventListener('dragstart', event => {
+			event.dataTransfer.setData('text/plain', this);
+			event.dataTransfer.effectAllowed = 'move';
+		})
 
 		const checkbox = liElm.querySelector('input[type=checkbox]');
 		checkbox.addEventListener('change', this.complete.bind(this, liElm));
@@ -261,6 +280,7 @@ class CreateProject_Element {
 
 	render() {
 		const liElm = document.createElement('li');
+		liElm.draggable = 'true'
 		liElm.innerHTML = `
 		<div>${this.projectItem.project}</div>
 		<div class="bin">
@@ -284,11 +304,13 @@ class CreateProject_Element {
 			</div>
 		`;
 
-		const divElm = liElm.querySelector('div');
-		divElm.addEventListener('click', this.uiUpdate.bind(this));
+		liElm.addEventListener('click', this.uiUpdate.bind(this));
 
 		const removeBtn = liElm.querySelector('.bin');
-		removeBtn.addEventListener('click', this.remove.bind(this, liElm));
+		removeBtn.addEventListener('click', event => {
+			this.remove.bind(this, liElm);
+			event.stopPropagation();
+		});
 		return liElm;
 	}
 
