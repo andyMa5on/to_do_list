@@ -2,6 +2,7 @@ const projectsMenu = document.getElementById('menu_btn');
 const addTask_Btn = document.getElementById('add_btn');
 const addProject_Btn = document.getElementById('add_Project');
 const menuClose_Btn = document.getElementById('menuClose_Btn');
+
 let allTasks = [];
 
 if (localStorage.key('allTasks') !== null) {
@@ -15,6 +16,8 @@ function openMenu() {
 	menu.classList.toggle('appear');
 	app.classList.toggle('minimise');
 }
+
+
 
 class CreateModal {
 	constructor() {}
@@ -127,6 +130,7 @@ class CreateTask_Element {
 		const liElm = document.createElement('li');
 		liElm.className = 'taskItem';
 		liElm.draggable = 'true';
+		liElm.id = `${this.taskItem.id}`
 		liElm.innerHTML = `
 			<input type="checkbox" name="complete" id="complete">
 			<input type="text" value="${this.taskItem.task}" editable />
@@ -152,9 +156,77 @@ class CreateTask_Element {
 		`;
 
 		liElm.addEventListener('dragstart', event => {
-			event.dataTransfer.setData('text/plain', this);
+			event.dataTransfer.setData('text/plain', event.target.id);
 			event.dataTransfer.effectAllowed = 'move';
+			liElm.style.opacity = 0.5;
 		})
+
+		liElm.addEventListener('dragenter', event => {
+			event.preventDefault();
+			liElm.classList.add('over')
+		});
+		
+		liElm.addEventListener('dragover', event => {
+			event.preventDefault();
+			if(!event.currentTarget.classList.contains('over')){
+				event.currentTarget.classList.add('over')
+			}
+		});
+		
+		liElm.addEventListener('dragleave', event => {
+			event.preventDefault();
+			liElm.classList.remove('over')
+		});
+
+		liElm.addEventListener('dragend', event => {
+			liElm.style.opacity = 1;
+		})
+
+		liElm.addEventListener('drop', event => {
+			const elm = event.dataTransfer.getData('text/plain');
+			let dropElm = document.elementFromPoint(event.clientX, event.clientY);
+			if (!dropElm.classList.contains("taskItem")){
+				dropElm = document.elementFromPoint(event.clientX, event.clientY).parentElement;
+			}
+			dropElm.insertAdjacentElement('beforebegin', document.getElementById(elm));
+			
+			dropElm.classList.remove('over')
+			document.getElementById(elm).style.opacity = 1;
+
+			const projectTitle = document.getElementById('project_Title').innerText
+
+			let taskIDX;
+			let insertIDX
+			allTasks.forEach((item, idx) => {
+				if (item.project === projectTitle){
+
+					item.tasks.forEach((task, index) =>{
+						if (task.id == elm){
+							taskIDX = index;
+
+						}
+
+						if (task.id == dropElm.id){
+							insertIDX = index;
+						}
+
+					})
+
+					const removeObject = allTasks[idx].tasks.splice(taskIDX, 1)
+
+					if (insertIDX > taskIDX){
+						allTasks[idx].tasks.splice((insertIDX - 1), 0, removeObject[0])
+					}else{
+					allTasks[idx].tasks.splice(insertIDX, 0, removeObject[0])
+					}
+
+				}
+
+			})
+			Page.localStorage();
+
+		});
+		
 
 		const checkbox = liElm.querySelector('input[type=checkbox]');
 		checkbox.addEventListener('change', this.complete.bind(this, liElm));
@@ -308,7 +380,7 @@ class CreateProject_Element {
 
 		const removeBtn = liElm.querySelector('.bin');
 		removeBtn.addEventListener('click', event => {
-			this.remove.bind(this, liElm);
+			this.remove.bind(this, liElm)();
 			event.stopPropagation();
 		});
 		return liElm;

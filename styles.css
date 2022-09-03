@@ -163,6 +163,10 @@ aside {
 	transform: translateX(28%);
 }
 
+#tasks >li.over {
+	background-color: #87838331;
+}
+
 #tasks {
 	background-color: white;
 	margin: 0 auto;
@@ -195,11 +199,13 @@ aside {
 	margin-bottom: 0.5rem;
 	margin-left: 1rem;
 	margin-right: 1rem;
+	background-color: #fff;
 	border: 1px solid lightgray;
 	border-radius: 8px;
 	text-align: center;
 	box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.035);
 }
+
 .taskItem > input[type="text"] {
 	border: none;
 	padding: 0.4rem;
