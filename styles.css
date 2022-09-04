@@ -124,7 +124,7 @@ aside {
 	vertical-align: middle;
 }
 
-#menu > li {
+#menu > .projectItem {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -136,6 +136,10 @@ aside {
 	margin-bottom: 0.5rem;
 	border: 1px solid rgba(0, 0, 0, 0.23);
 	border-radius: 8px;
+}
+
+#menu >li.over {
+	background-color: #87838331;
 }
 
 #menu > li:hover {
@@ -163,8 +167,38 @@ aside {
 	transform: translateX(28%);
 }
 
-#tasks >li.over {
-	background-color: #87838331;
+#fake.fakeProject {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	list-style: none;
+	width: 100%;
+	height: 3rem;
+	font-size: 1rem;
+	text-align: center;
+	padding: 0.5rem 0.5rem;
+	margin-bottom: 0.5rem;
+	border: 1px dashed rgba(0, 0, 0, 0.23);
+	border-radius: 8px;
+	opacity: 0.5;
+}
+
+#fake.fakeTask {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	list-style: none;
+	height: 3rem;
+	padding: 0.5rem;
+	margin-bottom: 0.5rem;
+	margin-left: 1rem;
+	margin-right: 1rem;
+	background-color: #fff;
+	border: 1px dashed #d3d3d3;
+	border-radius: 8px;
+	text-align: center;
+	box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.035);
+	opacity: 0.5;
 }
 
 #tasks {
@@ -206,6 +240,14 @@ aside {
 	box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.035);
 }
 
+#tasks >li.taskCompleted {
+	background-color: rgba(0, 171, 0, 0.15);
+}
+
+#tasks >li.over {
+	background-color: #87838331;
+}
+
 .taskItem > input[type="text"] {
 	border: none;
 	padding: 0.4rem;
@@ -213,10 +255,6 @@ aside {
 	margin-right: 0.5rem;
 	text-overflow: ellipsis;
 	background-color: #ffffff00;
-}
-
-.taskCompleted {
-	background-color: rgba(0, 171, 0, 0.15);
 }
 
 .taskItem > input:focus-visible {

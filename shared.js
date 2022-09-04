@@ -17,8 +17,6 @@ function openMenu() {
 	app.classList.toggle('minimise');
 }
 
-
-
 class CreateModal {
 	constructor() {}
 
@@ -46,10 +44,11 @@ class CreateModal {
 
 		const input = modal.querySelector('#taskTitle');
 		input.addEventListener('keypress', (e) => {
-			if (e.key === "Enter"){
-				add_Task.render()
+			console.log(e)
+			if (e.key === 'Enter') {
+				add_Task.render();
 			}
-		})
+		});
 
 		backdrop.addEventListener('click', decon_Modal.remove);
 		backdrop.classList.toggle('hidden');
@@ -82,10 +81,10 @@ class CreateModal {
 
 		const input = modal.querySelector('#projectTitle');
 		input.addEventListener('keypress', (e) => {
-			if (e.key === "Enter"){
-				addProject.render()
+			if (e.key === 'Enter') {
+				addProject.render();
 			}
-		})
+		});
 
 		backdrop.addEventListener('click', decon_Modal.remove);
 		backdrop.classList.toggle('hidden');
@@ -130,7 +129,7 @@ class CreateTask_Element {
 		const liElm = document.createElement('li');
 		liElm.className = 'taskItem';
 		liElm.draggable = 'true';
-		liElm.id = `${this.taskItem.id}`
+		liElm.id = `${this.taskItem.id}`;
 		liElm.innerHTML = `
 			<input type="checkbox" name="complete" id="complete">
 			<input type="text" value="${this.taskItem.task}" editable />
@@ -155,78 +154,50 @@ class CreateTask_Element {
 			</div>
 		`;
 
-		liElm.addEventListener('dragstart', event => {
-			event.dataTransfer.setData('text/plain', event.target.id);
+		liElm.addEventListener('dragstart', (event) => {
+			event.dataTransfer.setData('taskitem', event.target.id);
 			event.dataTransfer.effectAllowed = 'move';
 			liElm.style.opacity = 0.5;
-		})
-
-		liElm.addEventListener('dragenter', event => {
-			event.preventDefault();
-			liElm.classList.add('over')
+			Page.fakeDropElm('fakeTask','tasks', event.dataTransfer.types[0])
 		});
-		
-		liElm.addEventListener('dragover', event => {
-			event.preventDefault();
-			if(!event.currentTarget.classList.contains('over')){
-				event.currentTarget.classList.add('over')
+
+		liElm.addEventListener('dragenter', (event) => {
+			if (event.dataTransfer.types[0] === 'taskitem') {
+				event.preventDefault();
+				liElm.classList.add('over');
 			}
 		});
-		
-		liElm.addEventListener('dragleave', event => {
-			event.preventDefault();
-			liElm.classList.remove('over')
-		});
 
-		liElm.addEventListener('dragend', event => {
-			liElm.style.opacity = 1;
-		})
-
-		liElm.addEventListener('drop', event => {
-			const elm = event.dataTransfer.getData('text/plain');
-			let dropElm = document.elementFromPoint(event.clientX, event.clientY);
-			if (!dropElm.classList.contains("taskItem")){
-				dropElm = document.elementFromPoint(event.clientX, event.clientY).parentElement;
-			}
-			dropElm.insertAdjacentElement('beforebegin', document.getElementById(elm));
-			
-			dropElm.classList.remove('over')
-			document.getElementById(elm).style.opacity = 1;
-
-			const projectTitle = document.getElementById('project_Title').innerText
-
-			let taskIDX;
-			let insertIDX
-			allTasks.forEach((item, idx) => {
-				if (item.project === projectTitle){
-
-					item.tasks.forEach((task, index) =>{
-						if (task.id == elm){
-							taskIDX = index;
-
-						}
-
-						if (task.id == dropElm.id){
-							insertIDX = index;
-						}
-
-					})
-
-					const removeObject = allTasks[idx].tasks.splice(taskIDX, 1)
-
-					if (insertIDX > taskIDX){
-						allTasks[idx].tasks.splice((insertIDX - 1), 0, removeObject[0])
-					}else{
-					allTasks[idx].tasks.splice(insertIDX, 0, removeObject[0])
-					}
-
+		liElm.addEventListener('dragover', (event) => {
+			if (event.dataTransfer.types[0] === 'taskitem') {
+				event.preventDefault();
+				if (!event.currentTarget.classList.contains('over')) {
+					event.currentTarget.classList.add('over');
 				}
-
-			})
-			Page.localStorage();
-
+			}
 		});
-		
+
+		liElm.addEventListener('dragleave', (event) => {
+			if (event.dataTransfer.types[0] === 'taskitem') {
+				event.preventDefault();
+				liElm.classList.remove('over');
+			}
+		});
+
+		liElm.addEventListener('dragend', (event) => {
+			liElm.style.opacity = 1;
+		});
+
+		liElm.addEventListener('drop', (event) => {
+			if (event.dataTransfer.types[0] === 'taskitem') {
+				Page.drop(
+					event.dataTransfer.getData('taskitem'),
+					event,
+					'taskItem',
+					'tasks'
+				);
+			}
+		});
 
 		const checkbox = liElm.querySelector('input[type=checkbox]');
 		checkbox.addEventListener('change', this.complete.bind(this, liElm));
@@ -237,7 +208,7 @@ class CreateTask_Element {
 		const input = liElm.querySelector('input[type=text]');
 		input.addEventListener('change', this.update.bind(this, liElm));
 
-		if (this.taskItem.complete == 'yes') {
+		if (this.taskItem.completed == 'yes') {
 			checkbox.checked = true;
 			liElm.classList.toggle('taskCompleted');
 			input.style.textDecoration = 'line-through';
@@ -246,20 +217,20 @@ class CreateTask_Element {
 	}
 
 	complete(element) {
-		console.log(this);
 		const checkbox = element.querySelector('input[type=checkbox]');
 		const input = element.querySelector('input[type=text]');
 		if (checkbox.checked == true) {
 			element.classList.toggle('taskCompleted'),
-				(input.style.textDecoration = 'line-through');
+			input.style.textDecoration = 'line-through';
 
 			allTasks.forEach((item, idx, allTasks) => {
-				item.tasks.forEach((task, index, tasks) => {
-					if (task.id == this.taskItem.id) {
-						task.complete = 'yes';
-						console.log(task);
-					}
-				});
+				if(item.project == document.getElementById('project_Title').innerText){
+					item.tasks.forEach((task, index, tasks) => {
+						if (task.id == this.taskItem.id) {
+							task.completed = 'yes';
+						}
+					});
+				}
 			});
 			Page.localStorage();
 		} else if (element.classList.contains('taskCompleted')) {
@@ -267,12 +238,13 @@ class CreateTask_Element {
 			input.style.textDecoration = 'none';
 
 			allTasks.forEach((item, idx, allTasks) => {
-				item.tasks.forEach((task, index, tasks) => {
-					if (task.id == this.taskItem.id) {
-						task.complete = 'no';
-						console.log(task);
-					}
-				});
+				if(item.project == document.getElementById('project_Title').innerText){
+					item.tasks.forEach((task, index, tasks) => {
+						if (task.id == this.taskItem.id) {
+							task.completed = 'no';
+						}
+					});
+				}
 			});
 			Page.localStorage();
 		}
@@ -284,7 +256,6 @@ class CreateTask_Element {
 				if (taskItem.id == this.taskItem.id) {
 					const input = element.querySelector('input[type=text]');
 					taskItem.task = input.value;
-					console.log(taskItem);
 				}
 			});
 		});
@@ -301,11 +272,13 @@ class CreateTask_Element {
 			taskList.removeChild(element);
 
 			allTasks.forEach((item, idx, allTasks) => {
-				item.tasks.forEach((task, position, tasks) => {
-					if (task.id == this.taskItem.id) {
-						allTasks[idx].tasks.splice(position, 1);
-					}
-				});
+				if(item.project == document.getElementById('project_Title').innerText){
+					item.tasks.forEach((task, position, tasks) => {
+						if (task.id == this.taskItem.id) {
+							allTasks[idx].tasks.splice(position, 1);
+						}
+					});
+				}
 			});
 			Page.localStorage();
 		} else {
@@ -338,6 +311,7 @@ class AddTask {
 
 class CreateProject_Object {
 	constructor(title) {
+		this.id = Date.now();
 		this.project = title;
 		this.tasks = [];
 		allTasks.push(this);
@@ -352,7 +326,9 @@ class CreateProject_Element {
 
 	render() {
 		const liElm = document.createElement('li');
-		liElm.draggable = 'true'
+		liElm.id = `${this.projectItem.id}`;
+		liElm.draggable = 'true';
+		liElm.className = 'projectItem';
 		liElm.innerHTML = `
 		<div>${this.projectItem.project}</div>
 		<div class="bin">
@@ -376,10 +352,55 @@ class CreateProject_Element {
 			</div>
 		`;
 
+		liElm.addEventListener('dragstart', (event) => {
+			event.dataTransfer.setData('projectitem', event.target.id);
+			event.dataTransfer.effectAllowed = 'move';
+			liElm.style.opacity = 0.5;
+			Page.fakeDropElm('fakeProject','menu', event.dataTransfer.types[0],)
+		});
+
+		liElm.addEventListener('dragenter', (event) => {
+			if (event.dataTransfer.types[0] === 'projectitem') {
+				event.preventDefault();
+				liElm.classList.add('over');
+			}
+		});
+
+		liElm.addEventListener('dragover', (event) => {
+			if (event.dataTransfer.types[0] === 'projectitem') {
+				event.preventDefault();
+				if (!event.currentTarget.classList.contains('over')) {
+					event.currentTarget.classList.add('over');
+				}
+			}
+		});
+
+		liElm.addEventListener('dragleave', (event) => {
+			if (event.dataTransfer.types[0] === 'projectitem') {
+				event.preventDefault();
+				liElm.classList.remove('over');
+			}
+		});
+
+		liElm.addEventListener('dragend', (event) => {
+			liElm.style.opacity = 1;
+		});
+
+		liElm.addEventListener('drop', (event) => {
+			if (event.dataTransfer.types[0] === 'projectitem') {
+				Page.drop(
+					event.dataTransfer.getData('projectitem'),
+					event,
+					'projectItem',
+					'menu'
+				);
+			}
+		});
+
 		liElm.addEventListener('click', this.uiUpdate.bind(this));
 
 		const removeBtn = liElm.querySelector('.bin');
-		removeBtn.addEventListener('click', event => {
+		removeBtn.addEventListener('click', (event) => {
 			this.remove.bind(this, liElm)();
 			event.stopPropagation();
 		});
@@ -397,14 +418,15 @@ class CreateProject_Element {
 
 			allTasks.forEach((item, idx, allTasks) => {
 				if (item.project === this.projectItem.project) {
-					item.tasks.forEach((task, idx, tasks) => {
-						const taskList = document.getElementById('tasks');
-						const taskElm = new CreateTask_Element(task);
-						const liElm = taskElm.render();
-						taskList.append(liElm);
-					});
+						item.tasks.forEach((task, idx, tasks) => {
+							const taskList = document.getElementById('tasks');
+							const taskElm = new CreateTask_Element(task);
+							const liElm = taskElm.render();
+							taskList.append(liElm);
+						});
 				}
 			});
+			
 			const projectList = document.getElementById('menu');
 			if (projectList.classList.contains('appear')) {
 				openMenu();
@@ -519,6 +541,156 @@ class Page {
 
 	static localStorage() {
 		localStorage.setItem('allTasks', JSON.stringify(allTasks));
+	}
+
+	static drop(elementID, event, classID, removeFakeEl) {
+		const elm = document.getElementById(elementID);
+
+		let dropElm = document.elementFromPoint(event.clientX, event.clientY);
+		console.log(dropElm)
+		if(
+			dropElm.classList.contains('fakeProject') ||
+			dropElm.classList.contains('fakeTask')
+		){
+			console.log(dropElm)
+		}else if (!dropElm.classList.contains(classID)) {
+			dropElm = dropElm.parentElement;
+		}
+
+		dropElm.insertAdjacentElement('beforebegin', elm);
+
+		document.getElementById(removeFakeEl).removeChild(document.getElementById('fake'))
+
+		dropElm.classList.remove('over');
+		elm.style.opacity = 1;
+
+		if (event.dataTransfer.types[0] === 'taskitem') {
+			const projectTitle =
+				document.getElementById('project_Title').innerText;
+
+			let taskIDX;
+			let insertIDX;
+
+			if (dropElm.id == 'fake'){
+				allTasks.forEach((item, idx) => {
+					if (item.project === projectTitle) {
+						item.tasks.forEach((task, index) => {
+							if (task.id == elm.id) {
+								taskIDX = index;
+							}
+						});
+					}
+					const removeObject = allTasks[idx].tasks.splice(taskIDX, 1);
+	
+					allTasks[idx].tasks.push(removeObject[0])
+				});
+			}else{
+				allTasks.forEach((item, idx) => {
+					if (item.project === projectTitle) {
+						item.tasks.forEach((task, index) => {
+							if (task.id == elm.id) {
+								taskIDX = index;
+							}
+	
+							if (task.id == dropElm.id) {
+								insertIDX = index;
+							}
+						});
+					}
+					const removeObject = allTasks[idx].tasks.splice(taskIDX, 1);
+	
+					if (insertIDX > taskIDX) {
+						allTasks[idx].tasks.splice(insertIDX - 1, 0, removeObject[0]);
+					} else {
+						allTasks[idx].tasks.splice(insertIDX, 0, removeObject[0]);
+					}
+				});
+			}	
+		} else {
+			const projectValue = elm.querySelector('div').innerText;
+			
+
+			let taskIDX;
+			let insertIDX;
+
+			if(dropElm.id == 'fake'){
+				allTasks.forEach((item, idx) => {
+					if (item.project === projectValue) {
+						taskIDX = idx;
+					}
+				});
+	
+				const removeObject = allTasks.splice(taskIDX, 1);
+				allTasks.push(removeObject[0])
+			} else {
+				const dropElm_Value = dropElm.querySelector('div').innerText;
+
+				allTasks.forEach((item, idx) => {
+					if (item.project === projectValue) {
+						taskIDX = idx;
+					}
+	
+					if (item.project === dropElm_Value) {
+						insertIDX = idx;
+					}
+				});
+	
+				const removeObject = allTasks.splice(taskIDX, 1);
+	
+				if (insertIDX > taskIDX) {
+					allTasks.splice(insertIDX - 1, 0, removeObject[0]);
+				} else {
+					allTasks.splice(insertIDX, 0, removeObject[0]);
+				}
+			}
+			
+		}
+
+		Page.localStorage();
+	}
+
+	static fakeDropElm (classStyle, appendElm, eventType, ParentElm) {
+		const fake = document.createElement('li')
+		fake.id = 'fake'
+		fake.className = classStyle
+		fake.innerText = `drop item at bottom of list`
+		const menu = document.getElementById(appendElm)
+		menu.append(fake)
+
+		fake.addEventListener('dragenter', (event) => {
+			if (event.dataTransfer.types[0] === eventType) {
+				event.preventDefault();
+				fake.classList.add('over');
+			}
+		});
+
+		fake.addEventListener('dragover', (event) => {
+			if (event.dataTransfer.types[0] === eventType) {
+				event.preventDefault();
+				if (!event.currentTarget.classList.contains('over')) {
+					event.currentTarget.classList.add('over');
+				}
+			}
+		});
+
+		fake.addEventListener('dragleave', (event) => {
+			if (event.dataTransfer.types[0] === eventType) {
+				event.preventDefault();
+				fake.classList.remove('over');
+			}
+		});
+
+		fake.addEventListener('drop', (event) => {
+			if (event.dataTransfer.types[0] === eventType) {
+				Page.drop(
+					event.dataTransfer.getData(eventType),
+					event,
+					eventType,
+					appendElm
+				);
+			}
+		});
+
 	}
 }
 
