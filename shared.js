@@ -44,8 +44,10 @@ class CreateModal {
 
 		const input = modal.querySelector('#taskTitle');
 		input.addEventListener('keypress', (e) => {
-			console.log(e)
-			if (e.key === 'Enter') {
+			if (e.key === 'Enter' && e.shiftKey == true) {
+				add_Task.render();
+				createModal.renderTask();
+			} else if (e.key === 'Enter') {
 				add_Task.render();
 			}
 		});
@@ -81,7 +83,10 @@ class CreateModal {
 
 		const input = modal.querySelector('#projectTitle');
 		input.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') {
+			if (e.key === 'Enter' && e.shiftKey == true) {
+				addProject.render();
+				createModal.renderProject();
+			} else if (e.key === 'Enter') {
 				addProject.render();
 			}
 		});
@@ -158,7 +163,7 @@ class CreateTask_Element {
 			event.dataTransfer.setData('taskitem', event.target.id);
 			event.dataTransfer.effectAllowed = 'move';
 			liElm.style.opacity = 0.5;
-			Page.fakeDropElm('fakeTask','tasks', event.dataTransfer.types[0])
+			Page.fakeDropElm('fakeTask', 'tasks', event.dataTransfer.types[0]);
 		});
 
 		liElm.addEventListener('dragenter', (event) => {
@@ -221,10 +226,13 @@ class CreateTask_Element {
 		const input = element.querySelector('input[type=text]');
 		if (checkbox.checked == true) {
 			element.classList.toggle('taskCompleted'),
-			input.style.textDecoration = 'line-through';
+				(input.style.textDecoration = 'line-through');
 
 			allTasks.forEach((item, idx, allTasks) => {
-				if(item.project == document.getElementById('project_Title').innerText){
+				if (
+					item.project ==
+					document.getElementById('project_Title').innerText
+				) {
 					item.tasks.forEach((task, index, tasks) => {
 						if (task.id == this.taskItem.id) {
 							task.completed = 'yes';
@@ -238,7 +246,10 @@ class CreateTask_Element {
 			input.style.textDecoration = 'none';
 
 			allTasks.forEach((item, idx, allTasks) => {
-				if(item.project == document.getElementById('project_Title').innerText){
+				if (
+					item.project ==
+					document.getElementById('project_Title').innerText
+				) {
 					item.tasks.forEach((task, index, tasks) => {
 						if (task.id == this.taskItem.id) {
 							task.completed = 'no';
@@ -252,12 +263,17 @@ class CreateTask_Element {
 
 	update(element) {
 		allTasks.forEach((item, idx, alltasks) => {
-			item.tasks.forEach((taskItem, index, tasks) => {
-				if (taskItem.id == this.taskItem.id) {
-					const input = element.querySelector('input[type=text]');
-					taskItem.task = input.value;
-				}
-			});
+			if (
+				item.project ==
+				document.getElementById('project_Title').innerText
+			) {
+				item.tasks.forEach((taskItem, index, tasks) => {
+					if (taskItem.id == this.taskItem.id) {
+						const input = element.querySelector('input[type=text]');
+						taskItem.task = input.value;
+					}
+				});
+			}
 		});
 		Page.localStorage();
 	}
@@ -272,7 +288,10 @@ class CreateTask_Element {
 			taskList.removeChild(element);
 
 			allTasks.forEach((item, idx, allTasks) => {
-				if(item.project == document.getElementById('project_Title').innerText){
+				if (
+					item.project ==
+					document.getElementById('project_Title').innerText
+				) {
 					item.tasks.forEach((task, position, tasks) => {
 						if (task.id == this.taskItem.id) {
 							allTasks[idx].tasks.splice(position, 1);
@@ -356,7 +375,11 @@ class CreateProject_Element {
 			event.dataTransfer.setData('projectitem', event.target.id);
 			event.dataTransfer.effectAllowed = 'move';
 			liElm.style.opacity = 0.5;
-			Page.fakeDropElm('fakeProject','menu', event.dataTransfer.types[0],)
+			Page.fakeDropElm(
+				'fakeProject',
+				'menu',
+				event.dataTransfer.types[0]
+			);
 		});
 
 		liElm.addEventListener('dragenter', (event) => {
@@ -418,15 +441,15 @@ class CreateProject_Element {
 
 			allTasks.forEach((item, idx, allTasks) => {
 				if (item.project === this.projectItem.project) {
-						item.tasks.forEach((task, idx, tasks) => {
-							const taskList = document.getElementById('tasks');
-							const taskElm = new CreateTask_Element(task);
-							const liElm = taskElm.render();
-							taskList.append(liElm);
-						});
+					item.tasks.forEach((task, idx, tasks) => {
+						const taskList = document.getElementById('tasks');
+						const taskElm = new CreateTask_Element(task);
+						const liElm = taskElm.render();
+						taskList.append(liElm);
+					});
 				}
 			});
-			
+
 			const projectList = document.getElementById('menu');
 			if (projectList.classList.contains('appear')) {
 				openMenu();
@@ -547,19 +570,19 @@ class Page {
 		const elm = document.getElementById(elementID);
 
 		let dropElm = document.elementFromPoint(event.clientX, event.clientY);
-		console.log(dropElm)
-		if(
+		if (
 			dropElm.classList.contains('fakeProject') ||
 			dropElm.classList.contains('fakeTask')
-		){
-			console.log(dropElm)
-		}else if (!dropElm.classList.contains(classID)) {
+		) {
+		} else if (!dropElm.classList.contains(classID)) {
 			dropElm = dropElm.parentElement;
 		}
 
 		dropElm.insertAdjacentElement('beforebegin', elm);
 
-		document.getElementById(removeFakeEl).removeChild(document.getElementById('fake'))
+		document
+			.getElementById(removeFakeEl)
+			.removeChild(document.getElementById('fake'));
 
 		dropElm.classList.remove('over');
 		elm.style.opacity = 1;
@@ -568,60 +591,78 @@ class Page {
 			const projectTitle =
 				document.getElementById('project_Title').innerText;
 
+			let projectIDX;
 			let taskIDX;
 			let insertIDX;
 
-			if (dropElm.id == 'fake'){
+			if (dropElm.id === 'fake') {
 				allTasks.forEach((item, idx) => {
 					if (item.project === projectTitle) {
+						projectIDX = idx;
 						item.tasks.forEach((task, index) => {
 							if (task.id == elm.id) {
 								taskIDX = index;
 							}
 						});
 					}
-					const removeObject = allTasks[idx].tasks.splice(taskIDX, 1);
-	
-					allTasks[idx].tasks.push(removeObject[0])
 				});
-			}else{
+
+				const removeObject = allTasks[projectIDX].tasks.splice(
+					taskIDX,
+					1
+				);
+
+				allTasks[projectIDX].tasks.push(removeObject[0]);
+			} else {
 				allTasks.forEach((item, idx) => {
 					if (item.project === projectTitle) {
+						projectIDX = idx;
 						item.tasks.forEach((task, index) => {
 							if (task.id == elm.id) {
 								taskIDX = index;
 							}
-	
+
 							if (task.id == dropElm.id) {
 								insertIDX = index;
 							}
 						});
 					}
-					const removeObject = allTasks[idx].tasks.splice(taskIDX, 1);
-	
-					if (insertIDX > taskIDX) {
-						allTasks[idx].tasks.splice(insertIDX - 1, 0, removeObject[0]);
-					} else {
-						allTasks[idx].tasks.splice(insertIDX, 0, removeObject[0]);
-					}
 				});
-			}	
+
+				const removeObject = allTasks[projectIDX].tasks.splice(
+					taskIDX,
+					1
+				);
+
+				if (insertIDX > taskIDX) {
+					allTasks[projectIDX].tasks.splice(
+						insertIDX - 1,
+						0,
+						removeObject[0]
+					);
+				} else {
+					allTasks[projectIDX].tasks.splice(
+						insertIDX,
+						0,
+						removeObject[0]
+					);
+				}
+			}
 		} else {
 			const projectValue = elm.querySelector('div').innerText;
-			
 
 			let taskIDX;
 			let insertIDX;
 
-			if(dropElm.id == 'fake'){
+			if (dropElm.id == 'fake') {
 				allTasks.forEach((item, idx) => {
 					if (item.project === projectValue) {
 						taskIDX = idx;
 					}
 				});
-	
+
 				const removeObject = allTasks.splice(taskIDX, 1);
-				allTasks.push(removeObject[0])
+				allTasks.push(removeObject[0]);
 			} else {
 				const dropElm_Value = dropElm.querySelector('div').innerText;
 
@@ -629,33 +670,31 @@ class Page {
 					if (item.project === projectValue) {
 						taskIDX = idx;
 					}
-	
+
 					if (item.project === dropElm_Value) {
 						insertIDX = idx;
 					}
 				});
-	
+
 				const removeObject = allTasks.splice(taskIDX, 1);
-	
+
 				if (insertIDX > taskIDX) {
 					allTasks.splice(insertIDX - 1, 0, removeObject[0]);
 				} else {
 					allTasks.splice(insertIDX, 0, removeObject[0]);
 				}
 			}
-			
 		}
-
 		Page.localStorage();
 	}
 
-	static fakeDropElm (classStyle, appendElm, eventType, ParentElm) {
-		const fake = document.createElement('li')
-		fake.id = 'fake'
-		fake.className = classStyle
-		fake.innerText = `drop item at bottom of list`
-		const menu = document.getElementById(appendElm)
-		menu.append(fake)
+	static fakeDropElm(classStyle, appendElm, eventType, ParentElm) {
+		const fake = document.createElement('li');
+		fake.id = 'fake';
+		fake.className = classStyle;
+		fake.innerText = `drop item at bottom of list`;
+		const menu = document.getElementById(appendElm);
+		menu.append(fake);
 
 		fake.addEventListener('dragenter', (event) => {
 			if (event.dataTransfer.types[0] === eventType) {
@@ -690,7 +729,6 @@ class Page {
 				);
 			}
 		});
-
 	}
 }
 

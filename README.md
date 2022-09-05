@@ -22,14 +22,26 @@ There are two ways you can create your first project. Both options will open a m
 
 1. On initially loading the page, if you have never created or deleted all projects the main section will appear with a few lines of text and a button asking you to create your first project.
 
-2. Using the projects `button` to open the list of all your projects, once opened you will see a need add button to create a task.
+2. Using the projects `button` to open the projects menu, once opened you will see a new add button to create a project.
+
+Once you have clicked either button a modal will appear where you can enter the project title. 
+
+The final step is can be completed in a number of ways:
+
+1. Use the bottom right `button` on the modal named "add"
+
+2. Hit the enter key on your keyboard
+
+3. If you would like to add more then one project press shift+enter. This will add your project and clear your project title so you can add your next one.
 
 ```
 Note: Once you create a new project the UI will automatically update causing the following things to happen:
 
-1. The projects side bar will close
+1. The projects menu will close
 2. The newly created project will be loaded so you can start creating tasks
 ```
+
+
 
 ## ***Deleting a project***
 
@@ -59,7 +71,7 @@ This feature is coming soon.
 
 ## ***Re-ordering projects***
 
-This feature is coming soon.
+To re-order your projects press and hold the left mouse button on the project you would like to move. While pressed drag the project to the position you would like it and release the left mouse button.
 
 # ***Tasks***
 
@@ -92,15 +104,15 @@ Note: If you delete a task it will be permanently removed.
 At the beginning of each task you will see a `checkbox`. Clicking on this `checkbox` will mark the task as completed. 
 
 ```
-Note: You can visable see if a task has been completed as its background will turn green.
+Note: You can visable see if a task has been completed as its background will turn green and the task title will have a line-through.
 ```
 
 ## ***Re-naming a task***
 
-To rename a task simply click anywhere in the task title.
+To rename a task, left mouse click anywhere in the task title.
 
 ## ***Re-ordering tasks***
-This feature is coming soon.
+To re-order your tasks press and hold the left mouse button on the task you would like to move. While pressed drag the task to the position you would like it and release the left mouse button.
 
 
 
