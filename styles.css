@@ -84,6 +84,10 @@ button {
 	color: rgb(0, 0, 0);
 }
 
+button:active{
+	scale: 0.95;
+}
+
 aside {
 	position: absolute;
 	z-index: 1;
